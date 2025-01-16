@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<head>
+    <title>Card Face Generator</title>
+    <style>
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .card-image {
+            width: 200px;
+            height: 300px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .download-btn {
+            margin: 10px;
+            padding: 5px 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card-container" id="container"></div>
+    <button class="download-btn" onclick="downloadAll()">Download All Images</button>
+    
+    <script>
+        const cards = [
+            { suit: 'hearts', rank: 'K', color: '#CC0000', symbol: '♔' },
+            { suit: 'hearts', rank: 'Q', color: '#CC0000', symbol: '♕' },
+            { suit: 'hearts', rank: 'J', color: '#CC0000', symbol: '♖' },
+            { suit: 'diamonds', rank: 'K', color: '#CC0000', symbol: '♔' },
+            { suit: 'diamonds', rank: 'Q', color: '#CC0000', symbol: '♕' },
+            { suit: 'diamonds', rank: 'J', color: '#CC0000', symbol: '♖' },
+            { suit: 'spades', rank: 'K', color: '#000000', symbol: '♔' },
+            { suit: 'spades', rank: 'Q', color: '#000000', symbol: '♕' },
+            { suit: 'spades', rank: 'J', color: '#000000', symbol: '♖' },
+            { suit: 'clubs', rank: 'K', color: '#000000', symbol: '♔' },
+            { suit: 'clubs', rank: 'Q', color: '#000000', symbol: '♕' },
+            { suit: 'clubs', rank: 'J', color: '#000000', symbol: '♖' }
+        ];
+
+        const container = document.getElementById('container');
+        
+        cards.forEach(card => {
+            const svg = createCardSVG(card);
+            container.innerHTML += svg;
+        });
+
+        function createCardSVG(card) {
+            return `
+                <svg class="card-image" id="${card.rank.toLowerCase()}_${card.suit}" viewBox="0 0 200 300">
+                    <rect x="10" y="10" width="180" height="280" fill="white" rx="10"/>
+                    <text x="100" y="170" fill="${card.color}" style="font-size: 120px; text-anchor: middle;">
+                        ${card.symbol}
+                    </text>
+                </svg>
+            `;
+        }
+
+        function getSuitSymbol(suit) {
+            const symbols = {
+                'hearts': '♥',
+                'diamonds': '♦',
+                'spades': '♠',
+                'clubs': '♣'
+            };
+            return symbols[suit];
+        }
+
+        function downloadAll() {
+            cards.forEach(card => {
+                const svg = document.getElementById(`${card.rank.toLowerCase()}_${card.suit}`);
+                const svgData = new XMLSerializer().serializeToString(svg);
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                
+                canvas.width = 200;
+                canvas.height = 300;
+                
+                img.onload = function() {
+                    ctx.drawImage(img, 0, 0);
+                    const link = document.createElement('a');
+                    // Fix the filename format
+                    link.download = `${card.rank === 'K' ? 'king' : card.rank === 'Q' ? 'queen' : 'jack'}_${card.suit}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                };
+                
+                // Fix the UTF-8 encoding issue
+                const encodedData = encodeURIComponent(svgData)
+                    .replace(/%([0-9A-F]{2})/g,
+                        function (match, p1) {
+                            return String.fromCharCode('0x' + p1);
+                    });
+                
+                img.src = 'data:image/svg+xml;base64,' + btoa(encodedData);
+            });
+        }
+    </script>
+</body>
+</html>

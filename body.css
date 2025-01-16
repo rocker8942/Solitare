@@ -1,0 +1,213 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: green;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+#game-container {
+    width: 100%;
+    max-width: 1000px;
+    height: 100vh;
+    background-color: #076324;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+}
+
+.top-row {
+    display: flex;
+    gap: 20px;
+    height: 150px;
+}
+
+.tableau-row {
+    display: flex;
+    gap: 20px;
+    flex-grow: 1;
+}
+
+.pile {
+    width: 100px;
+    height: 150px;
+    border: 2px dashed rgba(255, 255, 255, 0.3);
+    border-radius: 5px;
+    position: relative;
+}
+
+.card {
+    width: 100px;
+    height: 150px;
+    border-radius: 8px;
+    background-color: #fff;
+    position: absolute;
+    font-family: 'Times New Roman', serif;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2),
+                inset 0 0 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    padding: 5px;
+    margin: 5px;
+    transition: all 0.2s ease;
+}
+
+.card:hover {
+    box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3),
+                inset 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.card .corner {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    font-weight: bold;
+}
+
+.card .corner .value {
+    font-size: 16px;
+    margin-bottom: 2px;
+}
+
+.card .corner .suit {
+    font-size: 14px;
+}
+
+.card .corner.top {
+    top: 5px;
+    left: 5px;
+}
+
+.card .corner.bottom {
+    bottom: 5px;
+    right: 5px;
+    transform: rotate(180deg);
+}
+
+.card .center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: grid;
+    gap: 5px;
+    width: 80%;
+    height: 70%;
+}
+
+.card .pip {
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Suit colors */
+.card.red {
+    color: #CC0000;
+}
+
+.card.black {
+    color: #000000;
+}
+
+/* Card back pattern */
+.card.face-down {
+    background-color: #fff;
+    background-image: 
+        radial-gradient(circle at 50% 50%, #1B4B8C 2px, transparent 3px),
+        linear-gradient(135deg, transparent 45%, #1B4B8C 45%, #1B4B8C 55%, transparent 55%),
+        linear-gradient(45deg, transparent 45%, #1B4B8C 45%, #1B4B8C 55%, transparent 55%);
+    background-size: 10px 10px, 20px 20px, 20px 20px;
+    background-position: 0 0;
+    border: 1px solid #1a365d;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3),
+                inset 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.card::before,
+.card::after {
+    position: absolute;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.card::before {
+    top: 5px;
+    left: 5px;
+    content: attr(data-value);
+}
+
+.card::after {
+    bottom: 5px;
+    right: 5px;
+    transform: rotate(180deg);
+    content: attr(data-value);
+}
+
+.card.dragging {
+    opacity: 0.7;
+    box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.3);
+    transform: scale(1.05);
+    z-index: 1000;
+}
+
+.tableau-row .card:not(:first-child) {
+    margin-top: 28px;
+}
+
+/* Pattern styles for different ranks */
+.card .center.rank-2 { grid-template-rows: 1fr 1fr; }
+.card .center.rank-3 { grid-template-rows: 1fr 1fr 1fr; }
+.card .center.rank-4 { grid-template: 1fr 1fr / 1fr 1fr; }
+.card .center.rank-5 { grid-template: 1fr 1fr 1fr / 1fr 1fr; }
+.card .center.rank-6 { grid-template: 1fr 1fr 1fr / 1fr 1fr; }
+.card .center.rank-7 { grid-template: 1fr 1fr 1fr 1fr / 1fr 1fr; }
+.card .center.rank-8 { grid-template: 1fr 1fr 1fr 1fr / 1fr 1fr; }
+.card .center.rank-9 { grid-template: 1fr 1fr 1fr 1fr / 1fr 1fr 1fr; }
+.card .center.rank-10 { grid-template: 1fr 1fr 1fr 1fr / 1fr 1fr 1fr; }
+
+/* Face cards - update background properties */
+.center.face {
+    font-size: 70px;
+    font-weight: bold;
+    text-align: center;
+    background-size: 60% auto;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* Remove the after content completely */
+.center.face.K::after,
+.center.face.Q::after,
+.center.face.J::after {
+    content: none;
+}
+
+/* Face card images - update to use full names in filenames */
+.center.face.hearts.K { background-image: url('images/king_hearts.png'); }
+.center.face.hearts.Q { background-image: url('images/queen_hearts.png'); }
+.center.face.hearts.J { background-image: url('images/jack_hearts.png'); }
+
+.center.face.diamonds.K { background-image: url('images/king_diamonds.png'); }
+.center.face.diamonds.Q { background-image: url('images/queen_diamonds.png'); }
+.center.face.diamonds.J { background-image: url('images/jack_diamonds.png'); }
+
+.center.face.spades.K { background-image: url('images/king_spades.png'); }
+.center.face.spades.Q { background-image: url('images/queen_spades.png'); }
+.center.face.spades.J { background-image: url('images/jack_spades.png'); }
+
+.center.face.clubs.K { background-image: url('images/king_clubs.png'); }
+.center.face.clubs.Q { background-image: url('images/queen_clubs.png'); }
+.center.face.clubs.J { background-image: url('images/jack_clubs.png'); }
+
+/* Additional styles for cards and layout will go here */
